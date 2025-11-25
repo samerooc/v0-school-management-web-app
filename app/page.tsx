@@ -2,46 +2,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {
-  BookOpen,
-  Users,
-  Award,
-  Building2,
-  GraduationCap,
-  TrendingUp,
-  Calendar,
-  Phone,
-  Mail,
-  MapPin,
-} from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
+import { BookOpen, Users, Award, Building2, GraduationCap, TrendingUp, Phone, Mail, MapPin } from "lucide-react"
 
-export default async function HomePage() {
-  const supabase = await createClient()
-
-  const { data: settings } = await supabase.from("school_settings").select("key, value")
-
-  const settingsMap =
-    settings?.reduce(
-      (acc, { key, value }) => {
-        // Value is already the correct type from Supabase JSONB column
-        acc[key] = value
-        return acc
-      },
-      {} as Record<string, string>,
-    ) || {}
-
-  // Fetch latest announcements
-  const { data: announcements } = await supabase
-    .from("announcements")
-    .select("*")
-    .eq("published", true)
-    .order("publish_date", { ascending: false })
-    .limit(3)
-
-  // Fetch gallery images
-  const { data: galleryImages } = await supabase.from("gallery_images").select("*").order("display_order").limit(6)
-
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header */}
@@ -53,10 +16,8 @@ export default async function HomePage() {
                 <GraduationCap className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">
-                  {settingsMap.school_name || "Greenwood International School"}
-                </h1>
-                <p className="text-sm text-gray-600">{settingsMap.school_tagline || "Excellence in Education"}</p>
+                <h1 className="text-xl font-bold text-gray-900">Greenwood International School</h1>
+                <p className="text-sm text-gray-600">Excellence in Education</p>
               </div>
             </div>
             <Button asChild>
@@ -71,12 +32,12 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-blue-800 opacity-10" />
         <div className="container mx-auto px-4 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <Badge className="mb-4 bg-blue-600">Established {settingsMap.established_year || "2005"}</Badge>
+            <Badge className="mb-4 bg-blue-600">Established 2005</Badge>
             <h2 className="text-5xl font-bold text-gray-900 mb-6 text-balance">
-              Welcome to {settingsMap.school_name || "Greenwood International School"}
+              Welcome to Greenwood International School
             </h2>
             <p className="text-xl text-gray-700 mb-8 text-pretty leading-relaxed">
-              {settingsMap.about_us || "Nurturing young minds and fostering excellence in education"}
+              Nurturing young minds and fostering excellence in education. Join us in shaping the leaders of tomorrow.
             </p>
             <div className="flex gap-4 justify-center">
               <Button size="lg" asChild>
@@ -97,14 +58,14 @@ export default async function HomePage() {
             <Card>
               <CardContent className="p-6 text-center">
                 <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-gray-900">{settingsMap.total_students || "1200+"}</div>
+                <div className="text-3xl font-bold text-gray-900">1200+</div>
                 <div className="text-sm text-gray-600">Students</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-6 text-center">
                 <GraduationCap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-gray-900">{settingsMap.faculty_count || "85+"}</div>
+                <div className="text-3xl font-bold text-gray-900">85+</div>
                 <div className="text-sm text-gray-600">Faculty Members</div>
               </CardContent>
             </Card>
@@ -118,7 +79,7 @@ export default async function HomePage() {
             <Card>
               <CardContent className="p-6 text-center">
                 <Building2 className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-gray-900">{settingsMap.campus_area || "15 Acres"}</div>
+                <div className="text-3xl font-bold text-gray-900">15 Acres</div>
                 <div className="text-sm text-gray-600">Campus Area</div>
               </CardContent>
             </Card>
@@ -132,8 +93,8 @@ export default async function HomePage() {
           <div className="max-w-4xl mx-auto">
             <h2 className="text-4xl font-bold text-center mb-6 text-gray-900">About Our School</h2>
             <p className="text-lg text-gray-700 text-center mb-12 leading-relaxed">
-              {settingsMap.about_us ||
-                "Welcome to Greenwood International School, where we nurture young minds and foster excellence in education."}
+              Welcome to Greenwood International School, where we nurture young minds and foster excellence in
+              education. Our commitment to holistic development ensures every student reaches their full potential.
             </p>
             <div className="grid md:grid-cols-3 gap-6">
               <Card>
@@ -168,73 +129,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Gallery Section */}
-      {galleryImages && galleryImages.length > 0 && (
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center mb-12 text-gray-900">Campus Gallery</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {galleryImages.map((image) => (
-                <Card key={image.id} className="overflow-hidden group cursor-pointer">
-                  <div className="relative h-64 overflow-hidden">
-                    <img
-                      src={image.image_url || "/placeholder.svg?height=400&width=600"}
-                      alt={image.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="absolute bottom-0 p-4 text-white">
-                        <h3 className="font-semibold text-lg">{image.title}</h3>
-                        <p className="text-sm">{image.description}</p>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Announcements Section */}
-      {announcements && announcements.length > 0 && (
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-between mb-12">
-                <h2 className="text-4xl font-bold text-gray-900">Latest Announcements</h2>
-                <Calendar className="w-8 h-8 text-blue-600" />
-              </div>
-              <div className="space-y-4">
-                {announcements.map((announcement) => (
-                  <Card key={announcement.id}>
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-semibold text-gray-900">{announcement.title}</h3>
-                            {announcement.priority === "high" && <Badge variant="destructive">Important</Badge>}
-                          </div>
-                          <p className="text-gray-600 mb-3">{announcement.content}</p>
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <Calendar className="w-4 h-4" />
-                            {new Date(announcement.publish_date).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Contact Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -247,7 +141,7 @@ export default async function HomePage() {
                     <Phone className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Phone</h3>
-                  <p className="text-gray-600">{settingsMap.contact_phone || "+91-11-2345-6789"}</p>
+                  <p className="text-gray-600">+91-11-2345-6789</p>
                 </CardContent>
               </Card>
               <Card>
@@ -256,7 +150,7 @@ export default async function HomePage() {
                     <Mail className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Email</h3>
-                  <p className="text-gray-600">{settingsMap.contact_email || "info@greenwood.edu"}</p>
+                  <p className="text-gray-600">info@greenwood.edu</p>
                 </CardContent>
               </Card>
               <Card>
@@ -265,9 +159,7 @@ export default async function HomePage() {
                     <MapPin className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="font-semibold mb-2">Address</h3>
-                  <p className="text-gray-600 text-sm">
-                    {settingsMap.contact_address || "Sector 21, Knowledge Park, New Delhi"}
-                  </p>
+                  <p className="text-gray-600 text-sm">Sector 21, Knowledge Park, New Delhi</p>
                 </CardContent>
               </Card>
             </div>
@@ -279,11 +171,8 @@ export default async function HomePage() {
       <footer className="bg-gray-900 text-white py-8">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <p className="mb-2">
-              © {new Date().getFullYear()} {settingsMap.school_name || "Greenwood International School"}. All rights
-              reserved.
-            </p>
-            <p className="text-gray-400 text-sm">Principal: {settingsMap.principal_name || "Dr. Meera Sharma"}</p>
+            <p className="mb-2">© {new Date().getFullYear()} Greenwood International School. All rights reserved.</p>
+            <p className="text-gray-400 text-sm">Principal: Dr. Meera Sharma</p>
           </div>
         </div>
       </footer>
